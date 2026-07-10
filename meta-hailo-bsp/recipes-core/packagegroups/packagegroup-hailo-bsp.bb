@@ -25,7 +25,8 @@ RDEPENDS:${PN} = "\
     hailo-linux-init \
     ncurses libnl libnl-genl \
     hailo-thermal-engine \
-    hailo-thermal-service"
+    hailo-thermal-service \
+    kernel-module-v4l2loopback"
 
 # Development package group
 RDEPENDS:${PN}-dev-pkg = "\
