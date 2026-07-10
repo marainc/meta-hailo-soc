@@ -1,0 +1,10 @@
+# Overlay: cap parallelism so the Yocto parse/build fits in 14 GB RAM.
+header:
+  version: 11
+  includes:
+    - hailo15-sbc.yml
+local_conf_header:
+  lowmem: |
+    BB_NUMBER_PARSE_THREADS = "3"
+    BB_NUMBER_THREADS = "3"
+    PARALLEL_MAKE = "-j 3"

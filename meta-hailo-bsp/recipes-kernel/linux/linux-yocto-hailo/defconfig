@@ -435,6 +435,15 @@ CONFIG_HID_MULTITOUCH=m
 CONFIG_I2C_HID_OF=m
 CONFIG_USB=y
 CONFIG_USB_ANNOUNCE_NEW_DEVICES=y
+# USB/IP: forward a host-attached USB device over the network so it enumerates
+# as a real USB device here (validate USB drivers before the physical part).
+# VHCI_HCD = import/client side (spoof a device onto this board).
+CONFIG_USBIP_CORE=m
+CONFIG_USBIP_VHCI_HCD=m
+CONFIG_USBIP_HOST=m
+# CDC-ACM: USB serial driver for the ArduPilot flight controller (e.g. FlywooH743,
+# 1209:5741) → /dev/ttyACM0. Required to talk to the FC over USB (direct or usbip).
+CONFIG_USB_ACM=m
 CONFIG_USB_XHCI_HCD=y
 CONFIG_USB_EHCI_HCD=y
 CONFIG_USB_EHCI_ROOT_HUB_TT=y
