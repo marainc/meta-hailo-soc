@@ -28,7 +28,8 @@ RDEPENDS:${PN} = "\
     hailo-thermal-engine-dev \
     hailo-thermal-service \
     hailo-noc-measurement-script \
-    linux-kernel-vm-tools"
+    linux-kernel-vm-tools \
+    kernel-module-v4l2loopback"
 
 # Development package group
 RDEPENDS:${PN}-dev-pkg = "\
