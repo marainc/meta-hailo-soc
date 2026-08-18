@@ -1,7 +1,8 @@
 SUMMARY = "v4l2loopback virtual video device kernel module"
 DESCRIPTION = "Out-of-tree kernel module providing virtual V4L2 capture devices. \
-Used to expose a network-forwarded camera (host thermal cam over RTP/UDP) as a \
-local /dev/video node, since isochronous UVC cannot cross USB/IP."
+Provides the stable /dev/video33 node that wraith-thermal-streamer publishes the \
+onboard USB camera to, so consumers (falcon) open one fixed node regardless of \
+which /dev/videoN the physical camera lands on across reboots."
 HOMEPAGE = "https://github.com/umlaeute/v4l2loopback"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
@@ -19,10 +20,10 @@ EXTRA_OEMAKE += "KERNEL_DIR=${STAGING_KERNEL_BUILDDIR}"
 MAKE_TARGETS = "v4l2loopback.ko"
 MODULES_INSTALL_TARGET = "install"
 
-# Autoload at boot as /dev/video42 ("thermal-net"), matching the host-side
-# sender (thermal-to-hailo.sh) and falcon's camera config.
+# Autoload at boot as /dev/video33 ("thermal-cam") — the node
+# wraith-thermal-streamer streams into and falcon's camera config points at.
 KERNEL_MODULE_AUTOLOAD += "v4l2loopback"
 KERNEL_MODULE_PROBECONF += "v4l2loopback"
-module_conf_v4l2loopback = "options v4l2loopback devices=1 video_nr=42 card_label=thermal-net exclusive_caps=0 max_buffers=8"
+module_conf_v4l2loopback = "options v4l2loopback devices=1 video_nr=33 card_label=thermal-cam exclusive_caps=0 max_buffers=8"
 
 RPROVIDES:${PN} += "kernel-module-v4l2loopback"

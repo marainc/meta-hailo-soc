@@ -1,0 +1,26 @@
+# Wraith fleet image — the Hailo BSP plus meta-wraith, built for the hailo15-sbc
+# machine (what the Auvidea H100 carrier actually reports and boots).
+#
+# Build:
+#     cd ~/hailo15-yocto/meta-hailo-soc
+#     kas build kas/wraith.yml
+#
+# Includes lowmem.yml, which pulls in hailo15-sbc.yml (machine + core-image-hailo-dev
+# target) and caps parallelism so the build fits a 14 GB host.
+#
+# Output: build/tmp/deploy/images/hailo15-sbc/
+
+header:
+  version: 11
+  includes:
+    - lowmem.yml
+
+repos:
+  # Layer lives in this repo (meta-hailo-soc/meta-wraith); no url = same repo.
+  meta-wraith:
+    layers:
+      meta-wraith:
+
+local_conf_header:
+  wraith: |
+    IMAGE_INSTALL:append = " packagegroup-wraith"

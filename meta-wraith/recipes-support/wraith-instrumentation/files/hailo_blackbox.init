@@ -1,0 +1,30 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          blackbox
+# Required-Start:    $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Hailo persistent thermal/power/health blackbox recorder
+### END INIT INFO
+
+DAEMON=/usr/bin/hailo-thermal-watchdog
+
+case "$1" in
+  start)
+    echo "Starting blackbox recorder"
+    start-stop-daemon --start --background --exec "$DAEMON"
+    ;;
+  stop)
+    echo "Stopping blackbox recorder"
+    pkill -f hailo-thermal-watchdog 2>/dev/null
+    ;;
+  restart)
+    "$0" stop; sleep 1; "$0" start
+    ;;
+  status)
+    if pgrep -f hailo-thermal-watchdog >/dev/null 2>&1; then echo running; else echo stopped; fi
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status}"; exit 1
+    ;;
+esac

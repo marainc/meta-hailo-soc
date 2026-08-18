@@ -1,0 +1,19 @@
+# Stable device names for the wraith drone's USB serial peripherals.
+#
+# Without these, the only stable paths are /dev/serial/by-id/... which embed each
+# board's SERIAL NUMBER — so every drone would need a different mavlink-router
+# config. Matching on vendor:product instead gives every drone identical names,
+# so one baked config works fleet-wide.
+#
+# /dev/ttyACM* numbering is NOT stable: it depends on USB enumeration order,
+# which varies by boot and by which peripheral powers up first.
+
+# ArduPilot flight controller (Flywoo GOKU H743 Pro) -> /dev/fc
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="5741", SYMLINK+="fc"
+
+# mLRS Rx, STM32 virtual COM port -> /dev/mlrs
+# NOTE: 0483:5740 is the generic STM32 VCP id. On a wraith drone the only such
+# device is the mLRS Rx. It is ALSO what a Betaflight-flashed FC enumerates as,
+# so on a bench with a not-yet-converted FC attached this could match the wrong
+# device — flash the FC to ArduPilot first (it then presents as 1209:5741).
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5740", SYMLINK+="mlrs"

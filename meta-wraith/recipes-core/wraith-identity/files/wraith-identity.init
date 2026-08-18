@@ -1,0 +1,28 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          wraith-identity
+# Required-Start:    $local_fs
+# Should-Start:      checkroot
+# Default-Start:     S
+# Default-Stop:
+# Short-Description: Grow rootfs and apply per-drone hostname/IP from /boot
+### END INIT INFO
+
+# Runs in rcS, before networking, so the interfaces file it writes is the one
+# networking then brings up.
+
+case "$1" in
+  start)
+    /usr/bin/wraith-identity
+    ;;
+  stop|restart|force-reload)
+    ;;
+  status)
+    echo "hostname=$(hostname) ip=$(ip -4 -br addr show eth0 2>/dev/null)"
+    ;;
+  *)
+    echo "Usage: $0 {start|status}"
+    exit 1
+    ;;
+esac
+exit 0
