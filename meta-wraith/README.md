@@ -12,8 +12,20 @@ fragments from this layer instead. Layer priority is 10, above every vendor laye
 
 ```
 cd ~/hailo15-yocto/meta-hailo-soc
-kas build kas/wraith.yml
+./kas/build-wraith.sh
 ```
+
+Use the wrapper, not `kas build` / bare `kas-container`. It pins two things that
+are load-bearing:
+
+- **Containerized, not native.** poky kirkstone's `pseudo` can't intercept a modern
+  host `tar`'s `*at()` syscalls, so native builds fail in `do_install`.
+- **`KAS_IMAGE_VERSION=4.7`.** kas 5.3's container image is Debian trixie
+  (Python 3.13), under which kirkstone-era bitbake dies mid-parse —
+  `ParseError: Not all recipes parsed, parser thread killed/died?`, preceded by
+  exceptions in unrelated meta-openembedded recipes (`freerdp`, `usbmuxd`,
+  `tvheadend`). The 4.7 image is Debian bookworm (Python 3.11) and parses all
+  2774 recipes with 0 errors. Confirmed by A/B — only the image version differed.
 
 Machine is `hailo15-sbc` — confirmed to be what the boards actually run (the stock
 Auvidea image's boot partition contains `swupdate-image-hailo15-sbc.ext4.gz`, and the
