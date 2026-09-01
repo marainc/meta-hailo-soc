@@ -1,0 +1,33 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          thermal-streamer
+# Required-Start:    $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Persistent thermal cam -> /dev/video33 streamer
+### END INIT INFO
+
+DAEMON=/usr/bin/wraith-thermal-streamer
+
+case "$1" in
+  start)
+    echo "Starting thermal streamer"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [init:start] invoked runlevel=$(runlevel 2>/dev/null) PATH=$PATH" >> /home/root/thermal-streamer.boot.log
+    start-stop-daemon --start --background --exec "$DAEMON"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [init:start] start-stop-daemon returned $?" >> /home/root/thermal-streamer.boot.log
+    ;;
+  stop)
+    echo "Stopping thermal streamer"
+    pkill -f wraith-thermal-streamer 2>/dev/null
+    pkill -f "v4l2sink device=/dev/video33" 2>/dev/null
+    ;;
+  restart)
+    "$0" stop; sleep 1; "$0" start
+    ;;
+  status)
+    if pgrep -f wraith-thermal-streamer >/dev/null 2>&1; then echo running; else echo stopped; fi
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status}"; exit 1
+    ;;
+esac

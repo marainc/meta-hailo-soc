@@ -1,0 +1,39 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          mavlink-router
+# Required-Start:    $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: mavlink-router — FC serial fan-out (replaces mavp2p)
+### END INIT INFO
+# Binary + config are installed by the mavlink-router package.
+# NOTE: mavp2p must never run at the same time — both open the same FC serial.
+# Images built from meta-wraith do not ship mavp2p at all.
+
+DAEMON=/usr/bin/mavlink-routerd
+CONF=/etc/mavlink-router/main.conf
+
+case "$1" in
+  start)
+    echo "Starting mavlink-router"
+    mkdir -p /var/log/mav_logs
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [init:start]" >> /var/log/mavlink-router.boot.log
+    start-stop-daemon --start --background --exec "$DAEMON" -- -c "$CONF"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [init:start] rc=$?" >> /var/log/mavlink-router.boot.log
+    ;;
+  stop)
+    echo "Stopping mavlink-router"
+    start-stop-daemon --stop --exec "$DAEMON" 2>/dev/null || pkill -f mavlink-routerd 2>/dev/null
+    ;;
+  restart)
+    "$0" stop; sleep 1; "$0" start
+    ;;
+  status)
+    if pgrep -f mavlink-routerd >/dev/null 2>&1; then echo running; else echo stopped; fi
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+    ;;
+esac
+exit 0
