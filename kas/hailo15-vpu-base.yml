@@ -20,6 +20,7 @@ repos:
     layers:
       meta-hailo-libhailort:
       meta-hailo-vpu:
+      meta-hailo-tappas:
   meta-hailo-dsp:
     layers:
         meta-hailo-dsp:
@@ -36,6 +37,3 @@ repos:
   meta-hailo-media-library:
     layers:
       meta-hailo-media-library:
-  meta-hailo-tappas:
-    layers:
-      meta-hailo-tappas:
