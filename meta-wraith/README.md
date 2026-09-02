@@ -27,6 +27,10 @@ are load-bearing:
   `tvheadend`). The 4.7 image is Debian bookworm (Python 3.11) and parses all
   2774 recipes with 0 errors. Confirmed by A/B — only the image version differed.
 
+See `../BUILDING.md` at the repo root for host prerequisites, timing, the full
+failure catalogue from actually building this to completion, and current flash/verify
+status.
+
 Machine is `hailo15-sbc` — confirmed to be what the boards actually run (the stock
 Auvidea image's boot partition contains `swupdate-image-hailo15-sbc.ext4.gz`, and the
 device tree reports `Hailo - Hailo15`). Output lands in
