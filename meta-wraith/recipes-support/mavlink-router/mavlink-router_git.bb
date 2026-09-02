@@ -29,8 +29,11 @@ INITSCRIPT_NAME = "mavlink-router"
 INITSCRIPT_PARAMS = "defaults 90 10"
 
 do_install:append() {
-    # sysvinit distro — discard upstream's systemd unit
+    # sysvinit distro — discard upstream's systemd unit. This leaves
+    # ${nonarch_libdir} (/usr/lib) itself as an empty leftover dir, which QA
+    # flags as installed-but-not-shipped, so clean it up too.
     rm -rf ${D}${nonarch_libdir}/systemd
+    rmdir --ignore-fail-on-non-empty ${D}${nonarch_libdir}
 
     install -d ${D}${sysconfdir}/init.d
     install -m 0755 ${WORKDIR}/mavlink-router.init ${D}${sysconfdir}/init.d/mavlink-router
