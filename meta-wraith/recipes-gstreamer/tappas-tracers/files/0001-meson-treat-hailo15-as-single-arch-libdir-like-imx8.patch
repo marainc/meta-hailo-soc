@@ -1,32 +1,38 @@
 core/hailo/meson.build: treat hailo15 as single-arch libdir, like imx8
 
-install_dir is hardcoded as '/usr/lib/' + arch_dir, where arch_dir defaults to a
-Debian-multiarch-style suffix ('aarch64-linux-gnu/') unless target_platform is
-'imx8'. hailotools-base.bbclass sets TARGET_PLATFORM:hailo15 = "hailo15", which
-doesn't match that check, so plugins install to
-/usr/lib/aarch64-linux-gnu/gstreamer-1.0/ -- but this recipe's own
-do_install:append() (and OE's libdir on this machine, "/usr/lib") expect plain
-/usr/lib/gstreamer-1.0/, so the post-install mv fails:
+install_dir is derived from arch_dir, which is only cleared to single-arch (no
+Debian-multiarch suffix) for target_platform == 'imx8'; every other
+unrecognized platform now hits `error('Unknown target platform: ...')` in this
+version of tappas (SRCREV 70c2d5bf2ad31fa47e4c1dc06fd5574055ea8772, pinned at
+meta-hailo kirkstone_v5.3.0). hailotools-base.bbclass sets
+TARGET_PLATFORM:hailo15 = "hailo15", which matches none of the recognized
+values, so meson configure fails outright:
 
-  mv: cannot stat '.../usr/lib/gstreamer-1.0/libgsthailotools.so.5.0.0': No such file or directory
+  ERROR: Unknown target platform: hailo15
 
-Extend just the arch_dir exception to hailo15. Deliberately not touching the
-other two target_platform checks in this tree (-DIMX8_TARGET in
-plugins/meson.build, the imx app subdir in apps/meson.build) -- those gate real
-iMX8-specific behavior that must stay off for this SoC.
+(At the older kirkstone_v5.0.0 pin this same recipe used, the check was a
+single `if target_platform == 'imx8'` with no `else` -- hailo15 silently fell
+through to the Debian-multiarch arch_dir instead, which broke the vendor
+recipe's own do_install:append() differently; see the 5.0.0-era version of
+this patch, superseded by this one.)
 
-Upstream: https://github.com/hailo-ai/tappas (branch master, SRCREV 86de5271c78429a093f8707bdaf413d5569beaeb)
+Add hailo15 as its own recognized platform, single-arch like imx8. Not folded
+into the imx8 branch itself, and not touching the x86/rpi/rockchip/aarch64
+branches -- those affect `arch` (used elsewhere for actual cross-compilation
+selection), not just arch_dir, and hailo15 should not inherit that behavior.
+
+Upstream: https://github.com/hailo-ai/tappas (SRCREV 70c2d5bf2ad31fa47e4c1dc06fd5574055ea8772)
 
 Signed-off-by: Claude Sonnet 5 <noreply@anthropic.com>
 
 --- a/meson.build
 +++ b/meson.build
-@@ -96,7 +96,7 @@ target_platform = get_option('target_platform')
- arch = host_machine.cpu_family()
- arch_dir = arch + '-linux-gnu/'
-
--if target_platform == 'imx8'
-+if target_platform == 'imx8' or target_platform == 'hailo15'
+@@ -87,6 +87,8 @@
+   arch = 'aarch64'
+ elif target_platform == 'imx8'
    arch_dir = ''
++elif target_platform == 'hailo15'
++  arch_dir = ''
+ else
+   error('Unknown target platform: ' + target_platform)
  endif
-
