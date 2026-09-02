@@ -1,0 +1,32 @@
+core/hailo/meson.build: treat hailo15 as single-arch libdir, like imx8
+
+install_dir is hardcoded as '/usr/lib/' + arch_dir, where arch_dir defaults to a
+Debian-multiarch-style suffix ('aarch64-linux-gnu/') unless target_platform is
+'imx8'. hailotools-base.bbclass sets TARGET_PLATFORM:hailo15 = "hailo15", which
+doesn't match that check, so plugins install to
+/usr/lib/aarch64-linux-gnu/gstreamer-1.0/ -- but this recipe's own
+do_install:append() (and OE's libdir on this machine, "/usr/lib") expect plain
+/usr/lib/gstreamer-1.0/, so the post-install mv fails:
+
+  mv: cannot stat '.../usr/lib/gstreamer-1.0/libgsthailotools.so.5.0.0': No such file or directory
+
+Extend just the arch_dir exception to hailo15. Deliberately not touching the
+other two target_platform checks in this tree (-DIMX8_TARGET in
+plugins/meson.build, the imx app subdir in apps/meson.build) -- those gate real
+iMX8-specific behavior that must stay off for this SoC.
+
+Upstream: https://github.com/hailo-ai/tappas (branch master, SRCREV 86de5271c78429a093f8707bdaf413d5569beaeb)
+
+Signed-off-by: Claude Sonnet 5 <noreply@anthropic.com>
+
+--- a/meson.build
++++ b/meson.build
+@@ -96,7 +96,7 @@ target_platform = get_option('target_platform')
+ arch = host_machine.cpu_family()
+ arch_dir = arch + '-linux-gnu/'
+
+-if target_platform == 'imx8'
++if target_platform == 'imx8' or target_platform == 'hailo15'
+   arch_dir = ''
+ endif
+
