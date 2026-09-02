@@ -12,8 +12,10 @@ PYPI_PACKAGE = "pymavlink"
 
 inherit pypi setuptools3
 
-# setup.py runs mavgen to generate the dialect modules at build time.
-DEPENDS += "python3-future-native python3-lxml-native"
+# setup.py runs mavgen to generate the dialect modules at build time, and
+# imports Cython.Build.cythonize directly (ModuleNotFoundError: No module
+# named 'Cython' without this).
+DEPENDS += "python3-future-native python3-lxml-native python3-cython-native"
 
 RDEPENDS:${PN} += "\
     python3-core \
