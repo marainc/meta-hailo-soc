@@ -30,3 +30,18 @@ local_conf_header:
   # of which wraith uses, so mask it instead of chasing the vendor recipe.
   mask-orphan-bbappends: |
     BBMASK += "meta-hailo-media-library/recipes-hailo-analytics/hailort-server"
+  # Same root cause, second bite: meta-hailo-media-library/classes/medialib-sdk.bbclass
+  # is globally INHERITed (via that layer's layer.conf) and unconditionally appends
+  # hailort-server-staticdev to TOOLCHAIN_TARGET_TASK, which core-image-hailo-dev's own
+  # bbappend folds into the image build -- so the dead package was a hard requirement
+  # even with the optional CLIP PACKAGECONFIG off. Strip it back out.
+  remove-orphan-toolchain-task: |
+    TOOLCHAIN_TARGET_TASK:remove = " hailort-server-staticdev"
+  # hailo-analytics-api (meta-hailo-media-library) unconditionally DEPENDS on libhailopp,
+  # a HailoRT C++ binding that does not exist in meta-hailo@kirkstone_v5.0.0 (only
+  # libhailort/libgsthailo/pyhailort/hailortcli ship at 5.0.0) -- it needs a newer
+  # HailoRT than this 1.8.0/5.0.0 build targets. wraith/falcon never uses Hailo's own
+  # analytics apps (falcon has its own separate perception pipeline), so drop it here;
+  # revisit when the branch moves to the 1.12.0/5.3.0 BSP.
+  drop-hailo-analytics-api: |
+    RDEPENDS:packagegroup-hailo-media-library:remove = " hailo-analytics-api"
