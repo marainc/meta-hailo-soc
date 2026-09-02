@@ -7,10 +7,14 @@ require u-boot-hailo.inc
 inherit hailo-cc312-sign
 
 SRC_URI:append = " file://fw_env.config.template"
-# Disable the U-Boot boot menu so bootdelay=-2 works -- required because the FC
-# shares ttyS1 with U-Boot's console and any byte aborts autoboot. See the
-# fragment for the full rationale.
+# Disable the U-Boot boot menu -- required because the FC shares ttyS1 with U-Boot's
+# console and any byte aborts autoboot while the menu is on. See the fragment for the
+# full rationale.
 SRC_URI:append = " file://cfg/autoboot_no_menu.cfg"
+# Keyed autoboot: only CONFIG_AUTOBOOT_STOP_STR aborts, not any byte, so bootdelay
+# stays a safe positive 2 and Ctrl-C is disabled during bootcmd too. See the
+# fragment for the full rationale; used together with the menu-off fragment above.
+SRC_URI:append = " file://cfg/autoboot_keyed.cfg"
 SRC_URI:append = "${@bb.utils.contains('MACHINE_FEATURES', 'ddr_ecc_en', ' file://cfg/hailo15_ddr_ecc_enable.cfg', '', d)}"
 SRC_URI:append = "${@bb.utils.contains('MACHINE_FEATURES', 'emmc_8bit', ' file://cfg/hailo15_sdio1_8bit.cfg', '', d)}"
 SRC_URI:append = "${@bb.utils.contains('MACHINE_FEATURES', 'coresight', ' file://cfg/coresight.cfg', '', d)}"
