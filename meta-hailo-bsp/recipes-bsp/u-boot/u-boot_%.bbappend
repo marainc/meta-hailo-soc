@@ -4,6 +4,16 @@ DEPENDS += "u-boot-mkenvimage-native"
 
 require u-boot-hailo.inc
 
+# EXPERIMENTAL: pin U-Boot source back to the 1.8.0 branch/SRCREV that phoenix0
+# actually runs (confirmed via /etc/os-release), instead of the 1.12.1 branch
+# u-boot-hailo.inc defaults to on this repo's current kirkstone tip. The KEYED
+# autoboot fix, tested against 1.12.1-sourced U-Boot, left phoenix0 stuck at
+# U-Boot (never reached Linux, FC not even attached) -- testing whether a
+# hardware-init/U-Boot-source version mismatch, not the autoboot logic itself,
+# was the actual cause.
+UBOOT_HAILO_BRANCH = "1.8.0"
+UBOOT_HAILO_SRCREV = "2a385a7178e3de1b52476589e1c0ec77f6bd19ae"
+
 inherit hailo-cc312-sign
 
 SRC_URI:append = " file://fw_env.config.template"
